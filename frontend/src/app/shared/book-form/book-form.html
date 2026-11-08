@@ -1,0 +1,57 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <label>
+    ISBN
+    <input formControlName="isbn" inputmode="numeric" autocomplete="off" />
+    @if (form.controls.isbn.touched && form.controls.isbn.invalid) {
+      <span class="field-error">Ange ett giltigt ISBN</span>
+    }
+  </label>
+
+  <label>
+    Titel
+    <input formControlName="title" />
+    @if (form.controls.title.touched && form.controls.title.invalid) {
+      <span class="field-error">Titel krävs</span>
+    }
+  </label>
+
+  <div class="row">
+    <label>Undertitel <input formControlName="subtitle" /></label>
+    <label>Originaltitel <input formControlName="originalTitle" /></label>
+  </div>
+
+  <div class="row">
+    <label>Författare (en per rad) <textarea formControlName="authors" rows="2"></textarea></label>
+    <label>Översättare (en per rad) <textarea formControlName="translators" rows="2"></textarea></label>
+  </div>
+
+  <div class="row">
+    <label>Genre (en per rad) <textarea formControlName="genres" rows="2"></textarea></label>
+    <label>Ämnesord (en per rad) <textarea formControlName="subjects" rows="2"></textarea></label>
+  </div>
+
+  <div class="row">
+    <label>Förlag <input formControlName="publisher" /></label>
+    <label>Serie <input formControlName="series" /></label>
+  </div>
+
+  <div class="row">
+    <label>Utgivningsår <input type="number" formControlName="publishedYear" /></label>
+    <label>Upplaga <input formControlName="edition" /></label>
+  </div>
+
+  <div class="row">
+    <label>Sidor <input type="number" formControlName="pages" /></label>
+    <label>Språk <input formControlName="language" maxlength="10" /></label>
+  </div>
+
+  <div class="row">
+    <label>Dewey <input formControlName="deweyClass" /></label>
+    <label>SAB-klass <input formControlName="sabClass" /></label>
+  </div>
+
+  <label>Sammanfattning <textarea formControlName="summary" rows="3"></textarea></label>
+  <label>Anteckningar <textarea formControlName="notes" rows="2"></textarea></label>
+
+  <button type="submit" [disabled]="saving()">{{ saving() ? 'Sparar…' : 'Spara' }}</button>
+</form>

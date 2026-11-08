@@ -1,0 +1,54 @@
+<h1>Mitt bibliotek</h1>
+
+<form class="search" (ngSubmit)="search()">
+  <input name="q" type="search" placeholder="Sök titel, författare, genre, ISBN, förlag"
+         [ngModel]="query()" (ngModelChange)="query.set($event)" />
+  <select name="genre" aria-label="Genre" [ngModel]="genre()" (ngModelChange)="genre.set($event); search()">
+    <option value="">Alla genrer</option>
+    @for (g of genres(); track g) {
+      <option [value]="g">{{ g }}</option>
+    }
+  </select>
+  <button type="submit">Sök</button>
+</form>
+
+@if (error()) {
+  <p class="error" role="alert">{{ error() }}</p>
+}
+
+@if (result(); as r) {
+  <p>{{ r.totalItems }} böcker</p>
+  <ul class="books">
+    @for (b of r.items; track b.id) {
+      <li>
+        <div>
+          <strong>{{ b.title }}</strong>@if (b.subtitle) { <span> – {{ b.subtitle }}</span> }
+          <div>{{ b.authors.join(', ') }}</div>
+          <small>
+            {{ b.publisher }}{{ b.publishedYear ? ', ' + b.publishedYear : '' }}{{ b.pages ? ' · ' + b.pages + ' sidor' : '' }}
+            · ISBN {{ b.isbn }}
+          </small>
+          @if (b.genres.length) {
+            <div class="chips">
+              @for (g of b.genres; track g) { <span class="chip">{{ g }}</span> }
+            </div>
+          }
+        </div>
+        <div class="actions">
+          <a [routerLink]="['/books', b.id]">Redigera</a>
+          <button type="button" class="secondary" (click)="remove(b)">Ta bort</button>
+        </div>
+      </li>
+    } @empty {
+      <li>Inga böcker hittades.</li>
+    }
+  </ul>
+
+  @if (r.totalPages > 1) {
+    <nav class="paging">
+      <button type="button" [disabled]="r.page === 0" (click)="load(r.page - 1)">Föregående</button>
+      <span>Sida {{ r.page + 1 }} av {{ r.totalPages }}</span>
+      <button type="button" [disabled]="r.page + 1 >= r.totalPages" (click)="load(r.page + 1)">Nästa</button>
+    </nav>
+  }
+}

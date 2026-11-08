@@ -1,0 +1,68 @@
+<h1>Skanna böcker</h1>
+
+<app-isbn-scanner (detected)="onDetected($event)" />
+<p class="feedback" aria-live="polite">{{ feedback() }}</p>
+
+<form class="manual" (ngSubmit)="submitManual()">
+  <input name="isbn" inputmode="numeric" placeholder="Eller skriv ISBN manuellt"
+         [ngModel]="manualIsbn()" (ngModelChange)="manualIsbn.set($event)" />
+  <button type="submit">Lägg i kön</button>
+</form>
+
+<section class="toolbar">
+  <span>
+    {{ queue.items().length }} i listan
+    @if (queue.lookupsPending() > 0) { · {{ queue.lookupsPending() }} väntar på Libris }
+  </span>
+  <label class="auto">
+    <input type="checkbox" [checked]="queue.autoSave()" (change)="queue.autoSave.set($any($event.target).checked)" />
+    Spara automatiskt
+  </label>
+  <button type="button" [disabled]="queue.readyToSave().length === 0" (click)="queue.saveAllReady()">
+    Spara alla hittade ({{ queue.readyToSave().length }})
+  </button>
+  @if (queue.finished().length > 0) {
+    <button type="button" class="secondary" (click)="queue.clearFinished()">Rensa klara</button>
+  }
+</section>
+
+<ul class="queue">
+  @for (item of queue.items(); track item.isbn) {
+    <li [class]="'status-' + item.status">
+      <div class="summary">
+        <div>
+          <strong>{{ item.book?.title || item.isbn }}</strong>
+          @if (item.book; as b) {
+            <div>{{ b.authors.join(', ') }}</div>
+            <small>
+              {{ b.publisher }}{{ b.publishedYear ? ', ' + b.publishedYear : '' }}
+              @if (b.genres.length) { · {{ b.genres.join(', ') }} }
+            </small>
+          }
+          <small class="isbn">ISBN {{ item.isbn }}</small>
+          @if (item.message) { <small class="msg">{{ item.message }}</small> }
+        </div>
+        <div class="actions">
+          <span class="badge">{{ label(item.status) }}</span>
+          @if (canEdit(item)) {
+            <button type="button" class="secondary" (click)="editing.set(editing() === item.isbn ? null : item.isbn)">Granska</button>
+            @if (item.status === 'found') {
+              <button type="button" (click)="queue.save(item.isbn, item.book!)">Spara</button>
+            }
+          }
+          @if (item.status === 'error') {
+            <button type="button" class="secondary" (click)="queue.retry(item.isbn)">Försök igen</button>
+          }
+          @if (item.status !== 'saving' && item.status !== 'searching') {
+            <button type="button" class="secondary" aria-label="Ta bort" (click)="queue.remove(item.isbn)">✕</button>
+          }
+        </div>
+      </div>
+      @if (editing() === item.isbn && item.book) {
+        <app-book-form [book]="item.book" (save)="saveEdited(item, $event)" />
+      }
+    </li>
+  } @empty {
+    <li class="empty">Rikta kameran mot en streckkod – böckerna läggs i kön och slås upp automatiskt.</li>
+  }
+</ul>

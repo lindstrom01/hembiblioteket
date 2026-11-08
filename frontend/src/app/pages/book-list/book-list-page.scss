@@ -1,0 +1,8 @@
+.search { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+.search input { flex: 1; }
+.books { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+.books li { display: flex; justify-content: space-between; gap: 1rem; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; }
+.actions { display: flex; gap: 0.5rem; align-items: center; }
+.chips { display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 0.25rem; }
+.chip { font-size: 0.75rem; background: #e3f2fd; border-radius: 999px; padding: 0.1rem 0.5rem; }
+.paging { display: flex; gap: 1rem; align-items: center; justify-content: center; margin-top: 1rem; }
